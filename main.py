@@ -1,4 +1,3 @@
-from operator import is_
 from pygame.locals import *
 import pygame as pg, sys
 
@@ -18,8 +17,6 @@ screen = pg.display.set_mode(WINDOW_SIZE, 0, 32)
 
 #fps clock
 clock = pg.time.Clock()
-
-
 
 """GAME LOOP"""
 def mainLoop():
