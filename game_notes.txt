@@ -1,0 +1,36 @@
+Elements - Earth, Plasma, Void
+
+** FEATURES TO HAVE ***
+
+HitJumping
+Fast Falling
+Gravity Cancels (wave dash input ;keep forward momentum)
+Wave dash/dance
+experimental (test game features/updates live)
+Coop training (with save states)
+
+Queue system (
+	subrank = 4;
+	ex. SilverIV promo -> GoldI
+	base = 15;
+	silver = base + 3
+	gold = base + 6
+	ruby = base + 8
+	diamond = base + 10
+	mythic = base + 11
+	god_rank = base + 12
+	base vr distr. (if lowRank > onerankHigher base+10; if lowRank > twoRankHigher base+20)
+)
+
+Ranked (void rank/elo) {
+	ranked_base_VR = 100;
+	ranks = [
+		silver(I=100-185,II=185-270,III=270-400,IV=400-525), 
+		gold(I=525-670,II=670-800,III=800-980,IV=980-1099), 
+		ruby:(I=1100-1350,II=1350-1570,III=1570-1800,IV=1800-1999)top50%, 
+		diamond:(I=2000-2350,II=2350-2570,III=2570-2800,IV=2800-2999)top25%, 
+		mythic:(I=3000-3350,II=3350-3570,III=3570-3800,IV=3800-3999)top10%, 
+		god_rank(I=4000-4350,II=4350-4570,III=4570-4800,IV=4800-5000):top2%
+	]
+}
+Tournament system (stolen from rocket league)
