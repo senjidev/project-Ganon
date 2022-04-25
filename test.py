@@ -14,7 +14,7 @@ screen = pygame.display.set_mode(WINDOW_SIZE,0,32) # initiate screen
 display = pygame.Surface((400, 300))
 
 
-player_image = pygame.image.load('characters/hatei/player.png').convert()
+player_image = pygame.image.load('characters/void_monk/void_monk.png').convert()
 player_image.set_colorkey((255,255,255))
 
 grass_image = pygame.image.load('images/world_tiles/grass.png')
@@ -69,6 +69,7 @@ def move(rect, movement, tiles):
 
 moving_right = False
 moving_left = False
+fast_fall = False
 
 player_y_momentum = 0
 air_timer = 0
@@ -104,13 +105,16 @@ while True: # game loop
     '''MOVEMENT HANDLING'''
     player_movement = [0, 0]
     if moving_right:
-        player_movement[0] += 2
+        player_movement[0] += 3
     if moving_left:
-        player_movement[0] -= 2
+        player_movement[0] -= 3
+    if fast_fall:
+        player_y_momentum += 0.4
+    
     player_movement[1] += player_y_momentum
-    player_y_momentum += 0.2
-    if player_y_momentum > 3:
-        player_y_momentum = 3
+    player_y_momentum += 0.4
+    if player_y_momentum > 6:
+        player_y_momentum = 6
 
     player_rect, collisions = move(player_rect, player_movement, tile_rects)
 
@@ -134,12 +138,17 @@ while True: # game loop
                 moving_right = True
             if event.key == K_a:
                 moving_left = True
-            if event.key == K_h:
+            if event.key == K_s:
+                fast_fall = True
+
+            '''if event.key == K_h:
                 player_image = pygame.image.load('characters/hatei/hatei.png').convert()
                 player_image.set_colorkey((0,0,0))
             if event.key == K_c:
                 player_image = pygame.image.load('characters/cindax/cindax_OG.png').convert()
-                player_image.set_colorkey((0,0,0))
+                player_image.set_colorkey((0,0,0))'''
+
+
             if event.key == K_SPACE:
                 if air_timer < 6:
                     player_y_momentum = -5
@@ -148,6 +157,8 @@ while True: # game loop
                 moving_right = False
             if event.key == K_a:
                 moving_left = False
+            if event.key == K_s:
+                fast_fall = False
 
     surf = pygame.transform.scale(display, WINDOW_SIZE)
     screen.blit(surf, (0, 0))
