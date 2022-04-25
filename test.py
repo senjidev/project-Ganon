@@ -1,70 +1,28 @@
-from pygame.locals import *
-import pygame as pg, sys
+import pygame, sys # import pygame and sys
 
-pg.init()
-is_running = True
+clock = pygame.time.Clock() # set up the clock
 
-#fps config
-clock = pg.time.Clock()
-fps = 60
+from pygame.locals import * # import pygame modules
+pygame.init() # initiate pygame
 
-#window setup
-WINDOW_SIZE = [800, 600]
-screen = pg.display.set_mode(WINDOW_SIZE, 0, 32)
-pg.display.set_caption('project-ganon')
+pygame.display.set_caption('project-ganon') # set the window name
 
-#draw background
-def draw_bg():
-    background_img = pg.image.load('images/backgrounds/bg.png')
-    screen.blit(background_img, (0,-270))
+WINDOW_SIZE = (800,600) # set up window size
 
-#player class
-class Player:
-    def __init__(self, x, y, character, damage):
-        #self.skin = skin
-        self.character = character
-        self.damage = damage
-        self.alive = True
-        self.anim_list = []
-        self.frame_index = 0
-        self.action = 0
-        self.update_time = pg.time.get_ticks()
+screen = pygame.display.set_mode(WINDOW_SIZE,0,32) # initiate screen
 
-        #load images
-        temp_list = []
-        for i in range(4):
-            img = pg.image.load(f'characters/hatei/hatei.png')
-            img = pg.transform.scale(img, (img.get_width()*3, img.get_height()*3))
-            temp_list.append(img)
-        self.anim_list.append(temp_list)
-        self.image = self.anim_list[self.action][self.frame_index]
-        self.rect = self.image.get_rect()
-        self.rect.center = (x,y)
+display = pygame.Surface((400, 300))
 
 
-    #animation update
-    def update(self):
-        anim_cooldown = 100
-        #update image
-        self.image = self.anim_list[self.action][self.frame_index]
-        #check if enough time has passed since last update
-        if pg.time.get_ticks()-self.update_time > anim_cooldown:
-            self.update_time = pg.time.get_ticks()
-            self.frame_index += 1
-        #if anim has run of of img's, then reset anim
-        if self.frame_index >= len(self.anim_list[self.action]):
-            self.frame_index = 0
-    
-    #draw player
-    def draw(self):
-        screen.blit(self.image, self.rect)
+player_image = pygame.image.load('characters/hatei/player.png').convert()
+player_image.set_colorkey((255,255,255))
 
-#map config
-grass_image = pg.image.load('images/world_tiles/grass.png')
-dirt_image = pg.image.load('images/world_tiles/dirt.png')
+grass_image = pygame.image.load('images/world_tiles/grass.png')
 TILE_SIZE = grass_image.get_width()
-class Map_Gen:
-    game_map = [['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'],
+
+dirt_image = pygame.image.load('images/world_tiles/dirt.png')
+
+game_map = [['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'],
@@ -78,9 +36,6 @@ class Map_Gen:
             ['0','0','0','0','0','0','0','1','1','1','1','1','0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0']]
 
-    def __init__(self,map_name):
-        self.map_name = map_name
-
 
 def collision_test(rect, tiles):
     hit_list = []
@@ -91,14 +46,11 @@ def collision_test(rect, tiles):
 
 
 def move(rect, movement, tiles):
-    collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
+    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
     rect.x += movement[0]
     hit_list = collision_test(rect, tiles)
     for tile in hit_list:
         if movement[0] > 0:
-            rect.right = tile.left
-            collision_types['right'] = True
-        elif movement[0] < 0:
             rect.right = tile.left
             collision_types['right'] = True
         elif movement[0] < 0:
@@ -115,41 +67,79 @@ def move(rect, movement, tiles):
             collision_types['top'] = True
     return rect, collision_types
 
-        #load tiles
+moving_right = False
+moving_left = False
 
-#name the crow hatei
-while is_running:
-    player = Player(250,400,'hatei',0)
-    #set clock
-    clock.tick(fps)
-    #draw background
-    draw_bg()
-    #map hitboxing
+player_y_momentum = 0
+air_timer = 0
+
+player_rect = pygame.Rect(60, 80, player_image.get_width(), player_image.get_height())
+test_rect = pygame.Rect(100,100,100,50)
+
+
+"""GAME LOOP"""
+bg = pygame.image.load('images/backgrounds/bg.png')
+while True: # game loop
+    
+    display.blit(bg, (0,-425))
+    
+    '''MAP HITBOXING'''
     tile_rects = []
-    y = 0
-    from kithalas_domain_numMap import game_map
+    y = 3
     for row in game_map:
-        x = 0
+        x = 3
         for tile in row:
             if tile == '1':
-                screen.blit(dirt_image, (x*TILE_SIZE,y*TILE_SIZE))
+                display.blit(dirt_image, (x * TILE_SIZE, y * TILE_SIZE))
             if tile == '2':
-                screen.blit(grass_image, (x*TILE_SIZE,y*TILE_SIZE))
+                display.blit(grass_image, (x * TILE_SIZE, y * TILE_SIZE))
             if tile != '0':
-                tile_rects.append(pg.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+                tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
             x += 1
         y += 1
-            
-    for events in pg.event.get():
-        if events.type == QUIT:
-            print('GAME CLOSED')
-            pg.quit()
-            sys.exit()
-        if events.type == KEYDOWN:
-            pass
-    
-    #draw player
-    player.update()
-    player.draw()
-    #screen refresh
-    pg.display.update()
+
+    '''MOVEMENT HANDLING'''
+    player_movement = [0, 0]
+    if moving_right:
+        player_movement[0] += 2
+    if moving_left:
+        player_movement[0] -= 2
+    player_movement[1] += player_y_momentum
+    player_y_momentum += 0.2
+    if player_y_momentum > 3:
+        player_y_momentum = 3
+
+    player_rect, collisions = move(player_rect, player_movement, tile_rects)
+
+    if collisions['bottom']:
+        player_y_momentum = 0
+        air_timer = 0
+    else:
+        air_timer += 1
+
+    display.blit(player_image, (player_rect.x, player_rect.y))
+
+
+    """EVENT HANDLER"""
+    for event in pygame.event.get(): # event loop
+        if event.type == QUIT: # check for window quit
+            pygame.quit() # stop pygame
+            sys.exit() # stop script
+        if event.type == KEYDOWN:
+            if event.key == K_d:
+                moving_right = True
+            if event.key == K_a:
+                moving_left = True
+            if event.key == K_SPACE:
+                if air_timer < 6:
+                    player_y_momentum = -5
+        if event.type == KEYUP:
+            if event.key == K_d:
+                moving_right = False
+            if event.key == K_a:
+                moving_left = False
+
+    surf = pygame.transform.scale(display, WINDOW_SIZE)
+    screen.blit(surf, (0, 0))
+    pygame.display.update() # update display
+    clock.tick(60) # maintain 60 fps
