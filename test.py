@@ -81,6 +81,7 @@ test_rect = pygame.Rect(100,100,100,50)
 bg = pygame.image.load('images/backgrounds/bg.png')
 while True: # game loop
     
+    #draw background
     display.blit(bg, (0,-425))
     
     '''MAP HITBOXING'''
@@ -96,7 +97,9 @@ while True: # game loop
             if tile != '0':
                 tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
             x += 1
-        y += 1
+        y += 1    
+
+
 
     '''MOVEMENT HANDLING'''
     player_movement = [0, 0]
@@ -117,11 +120,12 @@ while True: # game loop
     else:
         air_timer += 1
 
+    #draw player
     display.blit(player_image, (player_rect.x, player_rect.y))
 
 
     """EVENT HANDLER"""
-    for event in pygame.event.get(): # event loop
+    for event in pygame.event.get():
         if event.type == QUIT: # check for window quit
             pygame.quit() # stop pygame
             sys.exit() # stop script
