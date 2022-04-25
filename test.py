@@ -130,6 +130,10 @@ while True: # game loop
                 moving_right = True
             if event.key == K_a:
                 moving_left = True
+            if event.key == K_h:
+                player_image = pygame.image.load('characters/hatei/hatei.png').convert()
+            if event.key == K_c:
+                player_image = pygame.image.load('characters/cindax/cindax_OG.png').convert()
             if event.key == K_SPACE:
                 if air_timer < 6:
                     player_y_momentum = -5
